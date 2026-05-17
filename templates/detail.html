@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}{{ p.nama }} — PokéDex{% endblock %}
+{% block content %}
+
+<div class="detail-wrapper">
+
+    <!-- BACK + NAV -->
+    <div class="detail-topbar">
+        <a href="/" class="back-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+            Kembali
+        </a>
+        <div class="prev-next">
+            {% if prev_p %}
+            <a href="{{ url_for('detail', pokemon_id=prev_p.id) }}" class="pn-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                #{{ '%03d' % prev_p.id }} {{ prev_p.nama }}
+            </a>
+            {% endif %}
+            {% if next_p %}
+            <a href="{{ url_for('detail', pokemon_id=next_p.id) }}" class="pn-btn">
+                {{ next_p.nama }} #{{ '%03d' % next_p.id }}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="detail-grid">
+
+        <!-- LEFT: GAMBAR -->
+        <div class="detail-left">
+            <div class="detail-img-card">
+                <div class="detail-id">#{{ '%03d' % p.id }}</div>
+                <div class="detail-img-wrap" id="imgWrap">
+                    <img src="{{ p.gambar }}" alt="{{ p.nama }}" class="detail-img" id="mainImg">
+                    <div class="detail-img-glow"></div>
+                </div>
+                {% if p.gambar_shiny %}
+                <div class="shiny-toggle">
+                    <button class="shiny-btn" id="shinyBtn"
+                        data-normal="{{ p.gambar }}"
+                        data-shiny="{{ p.gambar_shiny }}">
+                        ✦ Tampilkan Shiny
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- TYPES -->
+            <div class="detail-types-row">
+                {% for tipe in p.tipe %}
+                <span class="type-badge type-{{ tipe | lower }} type-lg">{{ tipe }}</span>
+                {% endfor %}
+            </div>
+
+            <!-- ABILITIES -->
+            <div class="detail-section">
+                <div class="ds-label">ABILITIES</div>
+                <div class="abilities-list">
+                    {% for ab in p.abilities %}
+                    <span class="ability-chip">{{ ab }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- PHYSICAL -->
+            <div class="detail-section">
+                <div class="ds-label">DATA FISIK</div>
+                <div class="phys-grid">
+                    <div class="phys-item">
+                        <span class="phys-label">Tinggi</span>
+                        <span class="phys-val">{{ p.tinggi }} m</span>
+                    </div>
+                    <div class="phys-item">
+                        <span class="phys-label">Berat</span>
+                        <span class="phys-val">{{ p.berat }} kg</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARE SHORTCUT -->
+            <a href="{{ url_for('compare') }}?p1={{ p.id }}" class="compare-shortcut">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Bandingkan {{ p.nama }}
+            </a>
+        </div>
+
+        <!-- RIGHT: STATS -->
+        <div class="detail-right">
+            <h1 class="detail-name">{{ p.nama }}</h1>
+            {% if p.deskripsi %}
+            <p class="detail-desc">{{ p.deskripsi }}</p>
+            {% endif %}
+
+            <div class="detail-section" style="margin-top:28px">
+                <div class="ds-label">BASE STATS</div>
+                <div class="total-badge">TOTAL BST <strong>{{ p.total }}</strong></div>
+
+                <div class="big-stats">
+                    {% set stats = [
+                        ('HP',       p.hp,       'hp'),
+                        ('Attack',   p.attack,   'atk'),
+                        ('Defense',  p.defense,  'def'),
+                        ('Sp. Atk',  p.sp_atk,  'spatk'),
+                        ('Sp. Def',  p.sp_def,  'spdef'),
+                        ('Speed',    p.speed,    'spd'),
+                    ] %}
+                    {% for label, val, cls in stats %}
+                    <div class="big-stat-row">
+                        <span class="big-stat-name">{{ label }}</span>
+                        <span class="big-stat-num">{{ val }}</span>
+                        <div class="big-stat-bar">
+                            <div class="big-stat-fill {{ cls }}" style="width:{{ (val/255*100)|round }}%"></div>
+                        </div>
+                        <span class="big-stat-rank {% if val >= 100 %}rank-high{% elif val >= 60 %}rank-mid{% else %}rank-low{% endif %}">
+                            {% if val >= 100 %}S{% elif val >= 80 %}A{% elif val >= 60 %}B{% elif val >= 40 %}C{% else %}D{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- RADAR CHART -->
+            <div class="detail-section">
+                <div class="ds-label">STATS RADAR</div>
+                <canvas id="radarChart" width="320" height="280"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// Shiny toggle
+const btn = document.getElementById('shinyBtn');
+if (btn) {
+    let isShiny = false;
+    btn.addEventListener('click', () => {
+        isShiny = !isShiny;
+        document.getElementById('mainImg').src = isShiny ? btn.dataset.shiny : btn.dataset.normal;
+        btn.textContent = isShiny ? '✦ Tampilkan Normal' : '✦ Tampilkan Shiny';
+        btn.classList.toggle('active', isShiny);
+    });
+}
+
+// Radar Chart
+const ctx = document.getElementById('radarChart').getContext('2d');
+new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed'],
+        datasets: [{
+            data: [{{ p.hp }}, {{ p.attack }}, {{ p.defense }}, {{ p.sp_atk }}, {{ p.sp_def }}, {{ p.speed }}],
+            backgroundColor: 'rgba(0, 212, 255, 0.12)',
+            borderColor: '#00d4ff',
+            borderWidth: 2,
+            pointBackgroundColor: '#00d4ff',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+        }]
+    },
+    options: {
+        responsive: false,
+        scales: {
+            r: {
+                min: 0, max: 255,
+                ticks: { display: false },
+                grid: { color: 'rgba(255,255,255,0.07)' },
+                angleLines: { color: 'rgba(255,255,255,0.07)' },
+                pointLabels: { color: '#7a9bb5', font: { family: 'JetBrains Mono', size: 11 } }
+            }
+        },
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
+{% endblock %}

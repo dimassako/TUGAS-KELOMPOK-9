@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Ranking — PokéDex{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-eyebrow"><div class="hero-dot"></div>TOP POKEMON &bull; GEN I</div>
+    <h1 class="hero-title">Ranking <span class="accent">Pokemon</span></h1>
+    <p class="hero-subtitle">Sortir berdasarkan base stats terkuat di Generation I.</p>
+</section>
+
+<!-- SORT TABS -->
+<div class="rank-tabs">
+    {% set tabs = [('total','Total BST'),('hp','HP'),('attack','Attack'),('defense','Defense'),('sp_atk','Sp. Atk'),('sp_def','Sp. Def'),('speed','Speed')] %}
+    {% for key, label in tabs %}
+    <a href="{{ url_for('ranking') }}?sort={{ key }}" class="rank-tab {% if sort_by==key %}active{% endif %}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+<div class="rank-table-wrap">
+    <table class="rank-table">
+        <thead>
+            <tr>
+                <th style="width:50px">RANK</th>
+                <th style="width:60px"></th>
+                <th>POKEMON</th>
+                <th>TIPE</th>
+                <th class="num-col">HP</th>
+                <th class="num-col">ATK</th>
+                <th class="num-col">DEF</th>
+                <th class="num-col">SP.A</th>
+                <th class="num-col">SP.D</th>
+                <th class="num-col">SPD</th>
+                <th class="num-col accent-col">TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pokemon in ranked %}
+            {% set rank = loop.index %}
+            <tr class="rank-row {% if rank == 1 %}rank-gold{% elif rank == 2 %}rank-silver{% elif rank == 3 %}rank-bronze{% endif %}"
+                onclick="window.location='{{ url_for('detail', pokemon_id=pokemon.id) }}'">
+                <td class="rank-num">
+                    {% if rank == 1 %}<span class="medal">🥇</span>
+                    {% elif rank == 2 %}<span class="medal">🥈</span>
+                    {% elif rank == 3 %}<span class="medal">🥉</span>
+                    {% else %}<span class="rank-n">{{ rank }}</span>{% endif %}
+                </td>
+                <td><img src="{{ pokemon.gambar }}" alt="{{ pokemon.nama }}" class="rank-img" loading="lazy"></td>
+                <td class="rank-name-cell">
+                    <span class="rank-name">{{ pokemon.nama }}</span>
+                    <span class="rank-id">#{{ '%03d' % pokemon.id }}</span>
+                </td>
+                <td>
+                    <div class="rank-types">
+                        {% for tipe in pokemon.tipe %}
+                        <span class="type-badge type-{{ tipe | lower }}">{{ tipe }}</span>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td class="num-col {% if sort_by=='hp' %}col-active{% endif %}">{{ pokemon.hp }}</td>
+                <td class="num-col {% if sort_by=='attack' %}col-active{% endif %}">{{ pokemon.attack }}</td>
+                <td class="num-col {% if sort_by=='defense' %}col-active{% endif %}">{{ pokemon.defense }}</td>
+                <td class="num-col {% if sort_by=='sp_atk' %}col-active{% endif %}">{{ pokemon.sp_atk }}</td>
+                <td class="num-col {% if sort_by=='sp_def' %}col-active{% endif %}">{{ pokemon.sp_def }}</td>
+                <td class="num-col {% if sort_by=='speed' %}col-active{% endif %}">{{ pokemon.speed }}</td>
+                <td class="num-col accent-col {% if sort_by=='total' %}col-active{% endif %}"><strong>{{ pokemon.total }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

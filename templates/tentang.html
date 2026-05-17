@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Tentang — PokéDex{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-eyebrow"><div class="hero-dot"></div>TUGAS 1 KELOMPOK</div>
+    <h1 class="hero-title">Tentang <span class="accent">Proyek</span></h1>
+    <p class="hero-subtitle">Pemrograman Back-End — Institut Teknologi Tangerang Selatan</p>
+</section>
+<div class="tentang-container">
+    <div class="info-card">
+        <h2>// deskripsi</h2>
+        <p>Website ini dibuat sebagai tugas kelompok mata kuliah <strong style="color:var(--text-primary)">Pemrograman Back-End</strong> di ITTS. Menampilkan data Pokémon dari API publik secara dinamis menggunakan framework Flask (Python).</p>
+    </div>
+    <div class="info-card">
+        <h2>// fitur</h2>
+        <ul class="feature-list">
+            <li>🔍 Search & Filter — Cari pokemon berdasarkan nama, ID, atau tipe</li>
+            <li>📊 Halaman Detail — Stats lengkap, radar chart, dan mode shiny</li>
+            <li>⚡ Perbandingan — Head-to-head 2 pokemon dengan visual bar</li>
+            <li>🏆 Ranking — Sortir 151 pokemon berdasarkan berbagai stats</li>
+            <li>💾 Cache sistem — Data disimpan lokal agar tidak perlu fetch ulang</li>
+        </ul>
+    </div>
+    <div class="info-card">
+        <h2>// teknologi</h2>
+        <ul class="tech-list">
+            <li>Python + Flask — Web framework back-end</li>
+            <li>Library requests — Pengambilan data dari API publik</li>
+            <li>HTML Template Jinja2 — Data dinamis dengan looping & kondisi</li>
+            <li>Chart.js — Radar chart visualisasi stats</li>
+            <li>PokeAPI — Sumber data API publik gratis</li>
+        </ul>
+    </div>
+    <div class="info-card">
+        <h2>// api endpoint</h2>
+        <div class="api-info">
+            <p><strong style="color:var(--text-primary)">Nama:</strong> PokeAPI</p>
+            <p><strong style="color:var(--text-primary)">URL:</strong> <a href="https://pokeapi.co" target="_blank">https://pokeapi.co</a></p>
+            <p><strong style="color:var(--text-primary)">Endpoint:</strong> <code>GET /api/v2/pokemon?limit=151</code></p>
+            <p><strong style="color:var(--text-primary)">Auth:</strong> Tidak diperlukan — gratis & publik</p>
+            <p><strong style="color:var(--text-primary)">Format:</strong> JSON</p>
+        </div>
+    </div>
+    <div class="info-card">
+        <h2>// dosen pengampu</h2>
+        <p><strong style="color:var(--text-primary)">Anas Nasrulloh, S.Kom., M.Kom.</strong></p>
+        <p>Institut Teknologi Tangerang Selatan</p>
+    </div>
+</div>
+{% endblock %}

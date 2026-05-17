@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}PokéDex — Gen I Database{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-eyebrow"><div class="hero-dot"></div>LIVE &bull; POKEAPI.CO &bull; GENERATION I</div>
+    <h1 class="hero-title">Database <span class="accent">Pokémon</span><br>Generation I</h1>
+    <p class="hero-subtitle">151 Pokemon original dari Kanto. Data real-time dari PokeAPI menggunakan library <strong>requests</strong> Python.</p>
+    <div class="hero-badge"><div class="badge-ok"></div>{{ total_all }} POKEMON LOADED</div>
+</section>
+
+{% if error %}
+<div class="error-box"><strong>Koneksi API Gagal</strong><p style="margin-top:4px;font-size:13px;">{{ error }}</p></div>
+{% endif %}
+
+<div class="filter-bar">
+    <form method="GET" action="/" class="filter-form">
+        <div class="search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" name="q" value="{{ q }}" placeholder="Cari nama atau nomor ID..." class="search-input" autocomplete="off">
+        </div>
+        <select name="tipe" class="filter-select">
+            <option value="">Semua Tipe</option>
+            {% for tipe in semua_tipe %}
+            <option value="{{ tipe | lower }}" {% if tipe_filter == tipe | lower %}selected{% endif %}>{{ tipe }}</option>
+            {% endfor %}
+        </select>
+        <select name="sort" class="filter-select">
+            <option value="id"      {% if sort_by=='id'      %}selected{% endif %}>Sort: ID</option>
+            <option value="nama"    {% if sort_by=='nama'    %}selected{% endif %}>Sort: Nama A-Z</option>
+            <option value="total"   {% if sort_by=='total'   %}selected{% endif %}>Sort: Total Stats</option>
+            <option value="hp"      {% if sort_by=='hp'      %}selected{% endif %}>Sort: HP Tertinggi</option>
+            <option value="attack"  {% if sort_by=='attack'  %}selected{% endif %}>Sort: Attack Tertinggi</option>
+            <option value="defense" {% if sort_by=='defense' %}selected{% endif %}>Sort: Defense Tertinggi</option>
+            <option value="speed"   {% if sort_by=='speed'   %}selected{% endif %}>Sort: Speed Tertinggi</option>
+        </select>
+        <button type="submit" class="filter-btn">Terapkan</button>
+        {% if q or tipe_filter or sort_by != 'id' %}
+        <a href="/" class="filter-reset">Reset</a>
+        {% endif %}
+    </form>
+    <div class="filter-count">
+        Menampilkan <strong style="color:var(--accent)">{{ total }}</strong> / {{ total_all }} pokemon
+    </div>
+</div>
+
+{% if pokemon_list %}
+<div class="pokemon-grid">
+    {% for pokemon in pokemon_list %}
+    <a href="{{ url_for('detail', pokemon_id=pokemon.id) }}" class="pokemon-card">
+        <div class="pokemon-id">#{{ '%03d' % pokemon.id }}</div>
+        <div class="pokemon-img-wrapper">
+            {% if pokemon.gambar %}
+            <img src="{{ pokemon.gambar }}" alt="{{ pokemon.nama }}" class="pokemon-img" loading="lazy">
+            {% else %}<div class="no-img">?</div>{% endif %}
+        </div>
+        <h3 class="pokemon-name">{{ pokemon.nama }}</h3>
+        <div class="pokemon-types">
+            {% for tipe in pokemon.tipe %}
+            <span class="type-badge type-{{ tipe | lower }}">{{ tipe }}</span>
+            {% endfor %}
+        </div>
+        <div class="pokemon-info">
+            <div class="info-item"><span class="info-label">TINGGI</span><span class="info-value">{{ pokemon.tinggi }}m</span></div>
+            <div class="info-item"><span class="info-label">BERAT</span><span class="info-value">{{ pokemon.berat }}kg</span></div>
+            <div class="info-item"><span class="info-label">TOTAL</span><span class="info-value accent-val">{{ pokemon.total }}</span></div>
+        </div>
+        <div class="pokemon-stats">
+            <div class="stat-row"><span class="stat-name">HP</span><div class="stat-bar"><div class="stat-fill hp" style="width:{{ (pokemon.hp/255*100)|round }}%"></div></div><span class="stat-num">{{ pokemon.hp }}</span></div>
+            <div class="stat-row"><span class="stat-name">ATK</span><div class="stat-bar"><div class="stat-fill atk" style="width:{{ (pokemon.attack/255*100)|round }}%"></div></div><span class="stat-num">{{ pokemon.attack }}</span></div>
+            <div class="stat-row"><span class="stat-name">DEF</span><div class="stat-bar"><div class="stat-fill def" style="width:{{ (pokemon.defense/255*100)|round }}%"></div></div><span class="stat-num">{{ pokemon.defense }}</span></div>
+        </div>
+        <div class="card-hint">Lihat detail →</div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">◎</div>
+    <p>Tidak ada pokemon untuk <strong>"{{ q }}"</strong></p>
+    <a href="/" class="filter-reset" style="display:inline-block;margin-top:14px">← Reset</a>
+</div>
+{% endif %}
+{% endblock %}

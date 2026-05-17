@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Compare — PokéDex{% endblock %}
+{% block content %}
+
+<section class="hero">
+    <div class="hero-eyebrow"><div class="hero-dot"></div>HEAD TO HEAD &bull; GEN I</div>
+    <h1 class="hero-title">Bandingkan <span class="accent">Pokemon</span></h1>
+    <p class="hero-subtitle">Pilih 2 pokemon untuk membandingkan base stats mereka secara langsung.</p>
+</section>
+
+<!-- PICKER FORM -->
+<form method="GET" action="/compare" class="compare-form">
+    <div class="compare-pickers">
+        <div class="picker-group">
+            <label class="picker-label">POKEMON 1</label>
+            <select name="p1" class="picker-select" onchange="this.form.submit()">
+                <option value="">— Pilih Pokemon —</option>
+                {% for pk in pokemon_list %}
+                <option value="{{ pk.id }}" {% if p1 and p1.id == pk.id %}selected{% endif %}>#{{ '%03d' % pk.id }} {{ pk.nama }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="picker-group">
+            <label class="picker-label">POKEMON 2</label>
+            <select name="p2" class="picker-select" onchange="this.form.submit()">
+                <option value="">— Pilih Pokemon —</option>
+                {% for pk in pokemon_list %}
+                <option value="{{ pk.id }}" {% if p2 and p2.id == pk.id %}selected{% endif %}>#{{ '%03d' % pk.id }} {{ pk.nama }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</form>
+
+{% if p1 and p2 %}
+<div class="compare-arena">
+
+    <!-- HEADER CARDS -->
+    <div class="compare-header">
+        <div class="cmp-hero-card {% if p1.total > p2.total %}cmp-winner{% endif %}">
+            {% if p1.total > p2.total %}<div class="winner-tag">WINNER</div>{% endif %}
+            <img src="{{ p1.gambar }}" alt="{{ p1.nama }}" class="cmp-img">
+            <h2 class="cmp-name">{{ p1.nama }}</h2>
+            <div class="pokemon-types" style="justify-content:center;margin-bottom:8px">
+                {% for t in p1.tipe %}<span class="type-badge type-{{ t|lower }}">{{ t }}</span>{% endfor %}
+            </div>
+            <div class="cmp-total {% if p1.total > p2.total %}total-win{% endif %}">BST {{ p1.total }}</div>
+        </div>
+
+        <div class="cmp-center">
+            <div class="cmp-center-icon">⚡</div>
+        </div>
+
+        <div class="cmp-hero-card {% if p2.total > p1.total %}cmp-winner{% endif %}">
+            {% if p2.total > p1.total %}<div class="winner-tag">WINNER</div>{% endif %}
+            <img src="{{ p2.gambar }}" alt="{{ p2.nama }}" class="cmp-img">
+            <h2 class="cmp-name">{{ p2.nama }}</h2>
+            <div class="pokemon-types" style="justify-content:center;margin-bottom:8px">
+                {% for t in p2.tipe %}<span class="type-badge type-{{ t|lower }}">{{ t }}</span>{% endfor %}
+            </div>
+            <div class="cmp-total {% if p2.total > p1.total %}total-win{% endif %}">BST {{ p2.total }}</div>
+        </div>
+    </div>
+
+    <!-- STAT COMPARISON -->
+    {% set stat_pairs = [
+        ('HP',       p1.hp,      p2.hp),
+        ('Attack',   p1.attack,  p2.attack),
+        ('Defense',  p1.defense, p2.defense),
+        ('Sp. Atk',  p1.sp_atk,  p2.sp_atk),
+        ('Sp. Def',  p1.sp_def,  p2.sp_def),
+        ('Speed',    p1.speed,   p2.speed),
+    ] %}
+    <div class="cmp-stats">
+        {% for label, v1, v2 in stat_pairs %}
+        {% set mx = [v1, v2] | max %}
+        <div class="cmp-stat-row">
+            <span class="cmp-val {% if v1 > v2 %}cmp-win{% elif v1 < v2 %}cmp-lose{% endif %}">{{ v1 }}</span>
+            <div class="cmp-bars">
+                <div class="cmp-bar-left">
+                    <div class="cmp-fill-left {% if v1 >= v2 %}cmp-fill-win{% else %}cmp-fill-lose{% endif %}"
+                         style="width:{{ (v1/255*100)|round }}%"></div>
+                </div>
+                <span class="cmp-stat-label">{{ label }}</span>
+                <div class="cmp-bar-right">
+                    <div class="cmp-fill-right {% if v2 >= v1 %}cmp-fill-win{% else %}cmp-fill-lose{% endif %}"
+                         style="width:{{ (v2/255*100)|round }}%"></div>
+                </div>
+            </div>
+            <span class="cmp-val {% if v2 > v1 %}cmp-win{% elif v2 < v1 %}cmp-lose{% endif %}">{{ v2 }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% else %}
+<div class="empty-state" style="margin-top:40px">
+    <div class="empty-icon">⚡</div>
+    <p>Pilih 2 pokemon di atas untuk mulai membandingkan.</p>
+</div>
+{% endif %}
+{% endblock %}

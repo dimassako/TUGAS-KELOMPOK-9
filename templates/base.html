@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PokéDex{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <div class="nav-icon"><div class="nav-icon-dot"></div></div>
+                <span class="nav-title">Poké<span>DEX</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('halaman_utama') }}" class="{% if request.endpoint == 'halaman_utama' %}active{% endif %}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                    Beranda
+                </a></li>
+                <li><a href="{{ url_for('ranking') }}" class="{% if request.endpoint == 'ranking' %}active{% endif %}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    Ranking
+                </a></li>
+                <li><a href="{{ url_for('compare') }}" class="{% if request.endpoint == 'compare' %}active{% endif %}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    Compare
+                </a></li>
+                <li><a href="{{ url_for('tentang') }}" class="{% if request.endpoint == 'tentang' %}active{% endif %}">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Tentang
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">{% block content %}{% endblock %}</main>
+
+    <footer class="footer">
+        <p>TUGAS KELOMPOK &mdash; PEMROGRAMAN BACK-END &mdash; ITTS</p>
+        <p>DATA: <a href="https://pokeapi.co" target="_blank">POKEAPI.CO</a></p>
+    </footer>
+</body>
+</html>
